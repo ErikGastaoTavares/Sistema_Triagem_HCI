@@ -8,6 +8,67 @@ import Card from '../components/Card';
 import Button from '../components/Button';
 import FormGroup from '../components/FormGroup';
 
+// Função para renderizar a análise clínica em formato de lista
+const renderAnaliseClinica = (analise) => {
+  if (!analise) return null;
+  
+  // Remover os pontos/marcadores do início de cada linha
+  const cleanAnalise = analise
+    .replace(/^\s*•\s*/gm, '')  // Remove marcadores • do início das linhas
+    .replace(/^\s*\*\s*/gm, '')  // Remove marcadores * do início das linhas
+    .replace(/^\s*\.\s*/gm, '')  // Remove pontos do início das linhas
+    .replace(/^\s*-\s*/gm, '');  // Remove traços do início das linhas
+  
+  // Dividir por linhas ou por pontos
+  let topicos = [];
+  
+  if (cleanAnalise.includes('\n')) {
+    // Dividir por quebras de linha
+    topicos = cleanAnalise.split('\n').filter(t => t.trim());
+  } else {
+    // Dividir por pontos se não houver quebras de linha
+    topicos = cleanAnalise.split(/\s+•\s+|\.\s+(?=[A-Z])/).filter(t => t.trim());
+  }
+  
+  return (
+    <ul className="topicos-lista">
+      {topicos.map((topico, index) => (
+        <li key={index} className="topico-item">{topico}</li>
+      ))}
+    </ul>
+  );
+};
+
+// Função para renderizar as condutas recomendadas em formato de lista
+const renderCondutasRecomendadas = (condutas) => {
+  if (!condutas) return null;
+  
+  // Remover os números e pontos do início de cada linha
+  const cleanCondutas = condutas
+    .replace(/^\s*\d+\.\s*/gm, '')  // Remove números seguidos de ponto no início das linhas
+    .replace(/^\s*\d+\s*/gm, '')     // Remove números no início das linhas
+    .replace(/^\s*\.\s*/gm, '');     // Remove pontos do início das linhas
+  
+  // Dividir por linhas ou por pontos
+  let topicos = [];
+  
+  if (cleanCondutas.includes('\n')) {
+    // Dividir por quebras de linha
+    topicos = cleanCondutas.split('\n').filter(t => t.trim());
+  } else {
+    // Dividir por pontos se não houver quebras de linha
+    topicos = cleanCondutas.split(/\s+\d+\.\s+|\.\s+(?=[A-Z])/).filter(t => t.trim());
+  }
+  
+  return (
+    <ol className="condutas-lista">
+      {topicos.map((topico, index) => (
+        <li key={index} className="conduta-item">{topico}</li>
+      ))}
+    </ol>
+  );
+};
+
 export default function Home() {
   const [symptoms, setSymptoms] = useState('');
   const [loading, setLoading] = useState(false);
@@ -129,19 +190,19 @@ export default function Home() {
               </div>
               
               <div className="section">
-                <h3 className="section-title">Análise Clínica</h3>
-                <p>{result.justificativa}</p>
+                <h3>Análise Clínica</h3>
+                {renderAnaliseClinica(result.justificativa)}
               </div>
-              
+
               <div className="section">
-                <h3 className="section-title">Condutas Recomendadas</h3>
-                <p>{result.condutas}</p>
+                <h3>Condutas Recomendadas</h3>
+                {renderCondutasRecomendadas(result.condutas)}
               </div>
               
               <Card type="success" className="mt-3">
                 <p>✅ Triagem enviada para validação com sucesso!</p>
-                <p>🔍 ID de Rastreamento: {result.id}</p>
-                <p>👨‍⚕️ A triagem será revisada por especialistas clínicos para garantir a precisão da classificação e das condutas sugeridas.</p>
+                <p>ID de Rastreamento: {result.id}</p>
+                <p>A triagem será revisada por especialistas clínicos para garantir a precisão da classificação e das condutas sugeridas.</p>
               </Card>
             </Card>
           )}

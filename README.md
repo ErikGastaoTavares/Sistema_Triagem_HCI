@@ -1,7 +1,7 @@
 # Sistema de Triagem HCI
 
 <div align="center">
-  <img src="frontend/public/images/logo-hci.png" alt="Logo HCI" width="300"/>
+  <img src="https://hci.org.br/wp-content/uploads/2024/09/logo-300x67.png" alt="Logo HCI" width="300"/>
   <h3>Sistema Inteligente de Triagem Clínica</h3>
   <p>Baseado no Protocolo de Manchester com Inteligência Artificial</p>
 </div>

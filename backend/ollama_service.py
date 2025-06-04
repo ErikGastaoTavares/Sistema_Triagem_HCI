@@ -60,13 +60,13 @@ class OllamaService:
         return self._generate_fallback_response()
 
     def format_prompt(self, symptoms: str, similar_cases=None) -> str:
-        """Cria um prompt estruturado para o modelo Ollama."""
+        """Cria um prompt estruturado para o modelo Ollama com foco em respostas concisas."""
         return f"""Você é um sistema especializado em triagem hospitalar baseado no Protocolo de Manchester.
         
     Sua tarefa é analisar os sintomas do paciente e fornecer:
     1. Uma classificação de urgência (VERMELHO, LARANJA, AMARELO, VERDE ou AZUL)
-    2. Uma justificativa clínica detalhada para a classificação
-    3. Condutas recomendadas específicas para o caso
+    2. Uma análise clínica em tópicos curtos e objetivos
+    3. Condutas recomendadas em formato de lista numerada
 
     SINTOMAS DO PACIENTE:
     {symptoms}
@@ -83,14 +83,22 @@ class OllamaService:
     CLASSIFICAÇÃO: [COR]
 
     ANÁLISE CLÍNICA:
-    [Forneça uma análise detalhada dos sintomas, explicando por que eles se enquadram na classificação escolhida. Inclua possíveis diagnósticos diferenciais e fatores de risco. Mínimo de 3 parágrafos.]
+    [Ponto principal 1 - máximo 15 palavras]
+    [Ponto principal 2 - máximo 15 palavras]
+    [Ponto principal 3 - máximo 15 palavras]
+    [Ponto principal 4 - máximo 15 palavras]
 
     CONDUTAS RECOMENDADAS:
-    [Liste pelo menos 5 condutas específicas recomendadas para este caso, incluindo exames, medicações e orientações. Seja específico e detalhado.]
+    [Conduta 1 - máximo 15 palavras]
+    [Conduta 2 - máximo 15 palavras]
+    [Conduta 3 - máximo 15 palavras]
+    [Conduta 4 - máximo 15 palavras]
+    [Conduta 5 - máximo 15 palavras]
 
-    É ESSENCIAL que você forneça uma análise clínica detalhada e condutas específicas, não apenas a classificação.
+    IMPORTANTE: Seja extremamente conciso. Use apenas tópicos curtos com informações essenciais. Evite frases longas e explicações detalhadas. NÃO INCLUA MARCADORES (•, *, números) no início dos tópicos.
     """
 
+    # Se você tiver o método _create_prompt como alias, atualize-o também
     def _create_prompt(self, symptoms: str, similar_cases=None) -> str:
         """Alias para format_prompt para manter compatibilidade."""
         return self.format_prompt(symptoms, similar_cases)

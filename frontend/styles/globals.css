@@ -299,6 +299,26 @@ p {
   padding-bottom: 0.5rem;
 }
 
+/*Resposta da IA*/
+.topicos-lista, .condutas-lista {
+  padding-left: 1.5rem;
+  margin: 0.5rem 0;
+}
+
+.topico-item, .conduta-item {
+  margin-bottom: 0.5rem;
+  line-height: 1.5;
+  text-align: left;
+}
+
+.topicos-lista {
+  list-style-type: disc;
+}
+
+.condutas-lista {
+  list-style-type: decimal;
+}
+
 /* Cards */
 .card {
   background: white;
