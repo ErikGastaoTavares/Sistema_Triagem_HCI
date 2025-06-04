@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
 import axios from 'axios';
+import Modal from '../../../components/Modal';
 
 export default function Dashboard() {
   const [user, setUser] = useState(null);
@@ -12,6 +13,8 @@ export default function Dashboard() {
   const [error, setError] = useState('');
   const [validatingTriagem, setValidatingTriagem] = useState(null);
   const [feedback, setFeedback] = useState('');
+  const [modalOpen, setModalOpen] = useState(false);
+  const [modalMessage, setModalMessage] = useState('');
   const router = useRouter();
 
   useEffect(() => {
@@ -80,7 +83,8 @@ export default function Dashboard() {
 
   const submitValidation = async () => {
     if (!feedback.trim()) {
-      alert('Por favor, digite um feedback.');
+      setModalMessage('Por favor, digite um feedback.');
+      setModalOpen(true);
       return;
     }
     
@@ -94,16 +98,19 @@ export default function Dashboard() {
       });
       
       if (response.data.success) {
-        alert('Triagem validada com sucesso!');
+        setModalMessage('Triagem validada com sucesso!');
+        setModalOpen(true);
         setValidatingTriagem(null);
         setFeedback('');
         fetchDashboardData(); // Refresh data
       } else {
-        alert('Erro ao validar triagem. Por favor, tente novamente.');
+        setModalMessage('Erro ao validar triagem. Por favor, tente novamente.');
+        setModalOpen(true);
       }
     } catch (err) {
       console.error('Error validating triage:', err);
-      alert('Erro ao validar triagem. Por favor, tente novamente.');
+      setModalMessage('Erro ao validar triagem. Por favor, tente novamente.');
+      setModalOpen(true);
     } finally {
       setLoading(false);
     }
@@ -150,410 +157,268 @@ export default function Dashboard() {
             Validação de Triagem
           </h2>
           <button 
-            className="button"
+            className="button button-danger"
             onClick={cancelValidation}
-            style={{ 
-              background: '#6c757d',
-              marginBottom: 0 
-            }}
           >
-            ← Voltar
+            Cancelar
           </button>
         </div>
-
-        <div style={{
-          background: 'white',
-          padding: '2rem',
-          borderRadius: '10px',
-          boxShadow: '0 2px 10px rgba(0,0,0,0.1)',
-          marginBottom: '2rem'
-        }}>
-          <h3 style={{ color: '#003B71', marginBottom: '1rem' }}>
-            Informações da Triagem
-          </h3>
-          
-          <div style={{ marginBottom: '1rem' }}>
-            <strong>ID:</strong> {triagem.id}
+        
+        <div className="card">
+          <div className="card-header">
+            <h3 className="card-title">Informações do Paciente</h3>
           </div>
-          
-          <div style={{ marginBottom: '1rem' }}>
-            <strong>Data/Hora:</strong> {triagem.data_hora}
+          <div className="card-body">
+            <p><strong>ID da Triagem:</strong> {triagem?.id}</p>
+            <p><strong>Data:</strong> {new Date(triagem?.data).toLocaleString()}</p>
+            <p><strong>Sintomas:</strong> {triagem?.sintomas}</p>
           </div>
-          
-          <div style={{ marginBottom: '1rem' }}>
-            <strong>Sintomas do Paciente:</strong>
-            <div style={{ 
-              background: '#f8f9fa', 
-              padding: '1rem', 
-              borderRadius: '5px', 
-              marginTop: '0.5rem',
-              border: '1px solid #dee2e6'
-            }}>
-              {triagem.sintomas}
-            </div>
-          </div>
-
-          {triagem.classificacao && (
-            <div style={{ marginBottom: '1rem' }}>
-              <strong>Classificação IA:</strong>
-              <div className={`classification ${getClassificationColor(triagem.classificacao)}`} 
-                   style={{ marginTop: '0.5rem', padding: '0.5rem', borderRadius: '5px' }}>
-                {getClassificationText(triagem.classificacao)}
-              </div>
-            </div>
-          )}
-
-          {triagem.justificativa && (
-            <div style={{ marginBottom: '1rem' }}>
-              <strong>Análise Clínica da IA:</strong>
-              <div style={{ 
-                background: '#f8f9fa', 
-                padding: '1rem', 
-                borderRadius: '5px', 
-                marginTop: '0.5rem',
-                border: '1px solid #dee2e6'
-              }}>
-                {triagem.justificativa}
-              </div>
-            </div>
-          )}
-
-          {triagem.condutas && (
-            <div style={{ marginBottom: '1rem' }}>
-              <strong>Condutas Recomendadas pela IA:</strong>
-              <div style={{ 
-                background: '#f8f9fa', 
-                padding: '1rem', 
-                borderRadius: '5px', 
-                marginTop: '0.5rem',
-                border: '1px solid #dee2e6'
-              }}>
-                {triagem.condutas}
-              </div>
-            </div>
-          )}
         </div>
-
-        <div style={{
-          background: 'white',
-          padding: '2rem',
-          borderRadius: '10px',
-          boxShadow: '0 2px 10px rgba(0,0,0,0.1)'
-        }}>
-          <h3 style={{ color: '#003B71', marginBottom: '1rem' }}>
-            Validação do Especialista
-          </h3>
-          
-          <div style={{ marginBottom: '1rem' }}>
-            <label style={{ 
-              display: 'block', 
-              marginBottom: '0.5rem', 
-              fontWeight: 'bold',
-              color: '#003B71'
-            }}>
-              Feedback de Validação:
-            </label>
-            <textarea
-              value={feedback}
-              onChange={(e) => setFeedback(e.target.value)}
-              placeholder="Digite seu feedback sobre esta triagem. Inclua se concorda com a classificação, se há algo a corrigir, observações clínicas, etc."
-              style={{
-                width: '100%',
-                minHeight: '150px',
-                padding: '1rem',
-                border: '2px solid #dee2e6',
-                borderRadius: '8px',
-                fontSize: '14px',
-                fontFamily: 'inherit',
-                resize: 'vertical',
-                marginBottom: '1rem'
-              }}
-            />
+        
+        <div className="card mt-3">
+          <div className="card-header">
+            <h3 className="card-title">Resultado da Triagem</h3>
           </div>
-
-          <div style={{ marginBottom: '1rem', fontSize: '14px', color: '#6c757d' }}>
-            <strong>Validado por:</strong> {user}
+          <div className="card-body">
+            <div className={`classification ${getClassificationColor(triagem?.classificacao)}`}>
+              <h3>{getClassificationText(triagem?.classificacao)}</h3>
+            </div>
+            
+            <div className="section">
+              <h3 className="section-title">Análise Clínica</h3>
+              <p>{triagem?.justificativa}</p>
+            </div>
+            
+            <div className="section">
+              <h3 className="section-title">Condutas Recomendadas</h3>
+              <p>{triagem?.condutas}</p>
+            </div>
           </div>
-
-          <div style={{ display: 'flex', gap: '1rem' }}>
-            <button 
-              className="button"
-              onClick={submitValidation}
-              disabled={loading || !feedback.trim()}
-              style={{ marginBottom: 0 }}
-            >
-              {loading ? 'Validando...' : 'Confirmar Validação'}
-            </button>
-            <button 
-              className="button"
-              onClick={cancelValidation}
-              style={{ 
-                background: '#6c757d',
-                marginBottom: 0
-              }}
-            >
-              Cancelar
-            </button>
+        </div>
+        
+        <div className="card mt-3">
+          <div className="card-header">
+            <h3 className="card-title">Validação</h3>
+          </div>
+          <div className="card-body">
+            <div className="form-group">
+              <label className="form-label">Feedback da Validação</label>
+              <textarea 
+                className="form-textarea"
+                value={feedback}
+                onChange={(e) => setFeedback(e.target.value)}
+                placeholder="Digite seu feedback sobre esta triagem..."
+              />
+            </div>
+            
+            <div className="text-right">
+              <button 
+                className="button"
+                onClick={submitValidation}
+                disabled={loading}
+              >
+                {loading ? 'Processando...' : 'Validar Triagem'}
+              </button>
+            </div>
           </div>
         </div>
       </div>
     );
   };
 
-  const handleLogout = () => {
-    localStorage.removeItem('user');
-    router.push('/admin');
-  };
-
-  const renderContent = () => {
-    // If validating a triagem, show validation page
-    if (validatingTriagem) {
-      return renderValidationPage();
-    }
-
-    if (activeMenu === 'dashboard') {
-      return (
-        <>
-          <div className="dashboard-header">
-            <h2 style={{ color: '#003B71', margin: 0 }}>Dashboard - Estatísticas do Sistema</h2>
-          </div>
-          
-          <div className="stats-container">
-            <div className="stat-card stat-total">
-              <h3 style={{ color: '#003B71' }}>Total de Triagens</h3>
-              <h1 style={{ color: '#003B71' }}>{stats.total}</h1>
-            </div>
-            
-            <div className="stat-card stat-validated">
-              <h3 style={{ color: '#009B3A' }}>Validadas</h3>
-              <h1 style={{ color: '#009B3A' }}>{stats.validadas}</h1>
-            </div>
-            
-            <div className="stat-card stat-pending">
-              <h3 style={{ color: '#FF7F00' }}>Pendentes</h3>
-              <h1 style={{ color: '#FF7F00' }}>{stats.pendentes}</h1>
-            </div>
-          </div>
-          
-          {stats.pendentes > 0 && (
-            <div className="section">
-              <h3 className="section-title">Triagens Pendentes Recentes</h3>
-              {renderTriagensList(triagens.slice(0, 5))}
-            </div>
-          )}
-        </>
-      );
-    } else if (activeMenu === 'pendentes' || activeMenu === 'todas') {
-      const title = activeMenu === 'pendentes' ? 'Triagens Pendentes' : 'Todas as Triagens';
-      
-      return (
-        <>
-          <div className="dashboard-header">
-            <h2 style={{ color: '#003B71', margin: 0 }}>{title}</h2>
-          </div>
-          
-          {triagens.length > 0 ? (
-            renderTriagensList(triagens)
-          ) : (
-            <p>Nenhuma triagem encontrada.</p>
-          )}
-        </>
-      );
-    } else if (activeMenu === 'conhecimento') {
-      return (
-        <>
-          <div className="dashboard-header">
-            <h2 style={{ color: '#003B71', margin: 0 }}>Banco de Conhecimento</h2>
-          </div>
-          
-          <div className="card">
-            <p>🚧 Funcionalidade em desenvolvimento - Visualização de casos validados e padrões identificados.</p>
-          </div>
-        </>
-      );
-    } else if (activeMenu === 'exportar') {
-      return (
-        <>
-          <div className="dashboard-header">
-            <h2 style={{ color: '#003B71', margin: 0 }}>📤 Exportar Dados</h2>
-          </div>
-          
-          <button 
-            className="button"
-            style={{ marginBottom: '1rem' }}
-            onClick={() => alert('Funcionalidade em desenvolvimento')}
-          >
-            Gerar CSV
-          </button>
-        </>
-      );
-    }
-  };
-
-  const renderTriagensList = (triagens) => {
-    return triagens.map((triagem) => {
-      const borderColor = triagem.validado === 1 ? '#009B3A' : '#FF7F00';
-      const statusText = triagem.validado === 1 ? 'Validada' : 'Pendente';
-      
-      return (
-        <div 
-          key={triagem.id}
-          style={{
-            background: 'white',
-            padding: '1.5rem',
-            borderRadius: '10px',
-            boxShadow: '0 2px 10px rgba(0,0,0,0.1)',
-            borderLeft: `4px solid ${borderColor}`,
-            marginBottom: '1rem'
-          }}
-        >
-          <h4 style={{ color: '#003B71', marginBottom: '0.5rem' }}>
-            ID: {triagem.id.substring(0, 8)}... | {statusText}
-          </h4>
-          <p style={{ margin: '0.25rem 0', color: '#58595B' }}>
-            <strong>Data:</strong> {triagem.data_hora}
-          </p>
-          <p style={{ margin: '0.25rem 0', color: '#58595B' }}>
-            <strong>Sintomas:</strong> {triagem.sintomas.substring(0, 100)}...
-          </p>
-          
-          {triagem.validado === 0 && (
-            <button 
-              className="button"
-              style={{ marginTop: '0.5rem' }}
-              onClick={() => handleValidate(triagem)}
-            >
-              Validar triagem
-            </button>
-          )}
+  // Render dashboard content
+  const renderDashboard = () => {
+    return (
+      <div>
+        <div className="dashboard-header">
+          <h2>Bem-vindo, {user}!</h2>
+          <p>Painel de controle do Sistema de Triagem HCI</p>
         </div>
-      );
-    });
+        
+        <div className="stats-container">
+          <div className="stat-card stat-total">
+            <h3>Total de Triagens</h3>
+            <h1>{stats.total}</h1>
+          </div>
+          
+          <div className="stat-card stat-validated">
+            <h3>Triagens Validadas</h3>
+            <h1>{stats.validadas}</h1>
+          </div>
+          
+          <div className="stat-card stat-pending">
+            <h3>Triagens Pendentes</h3>
+            <h1>{stats.pendentes}</h1>
+          </div>
+        </div>
+        
+        <div className="card">
+          <div className="card-header">
+            <h3 className="card-title">Triagens Recentes Pendentes de Validação</h3>
+          </div>
+          <div className="card-body">
+            {triagens.length === 0 ? (
+              <p>Não há triagens pendentes de validação.</p>
+            ) : (
+              <div>
+                {triagens.slice(0, 5).map((triagem) => (
+                  <div key={triagem.id} className="card mb-3">
+                    <div className="card-body">
+                      <p><strong>Data:</strong> {new Date(triagem.data).toLocaleString()}</p>
+                      <p><strong>Sintomas:</strong> {triagem.sintomas.substring(0, 100)}...</p>
+                      <p>
+                        <strong>Classificação:</strong> 
+                        <span className={`badge ${getClassificationColor(triagem.classificacao)}`} style={{ marginLeft: '8px' }}>
+                          {getClassificationText(triagem.classificacao)}
+                        </span>
+                      </p>
+                      <div className="text-right">
+                        <button 
+                          className="button"
+                          onClick={() => handleValidate(triagem)}
+                        >
+                          Validar
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+                
+                {triagens.length > 5 && (
+                  <div className="text-center mt-3">
+                    <button 
+                      className="button button-secondary"
+                      onClick={() => handleMenuClick('pendentes')}
+                    >
+                      Ver Todas Pendentes
+                    </button>
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+    );
   };
 
-  if (!user) {
-    return <div>Redirecionando...</div>;
-  }
+  // Render all triagens
+  const renderTriagensList = () => {
+    return (
+      <div>
+        <h2>{activeMenu === 'pendentes' ? 'Triagens Pendentes' : 'Todas as Triagens'}</h2>
+        
+        {triagens.length === 0 ? (
+          <div className="card">
+            <div className="card-body">
+              <p>Não há triagens para exibir.</p>
+            </div>
+          </div>
+        ) : (
+          <div>
+            {triagens.map((triagem) => (
+              <div key={triagem.id} className="card mb-3">
+                <div className="card-body">
+                  <p><strong>ID:</strong> {triagem.id}</p>
+                  <p><strong>Data:</strong> {new Date(triagem.data).toLocaleString()}</p>
+                  <p><strong>Sintomas:</strong> {triagem.sintomas.substring(0, 100)}...</p>
+                  <p>
+                    <strong>Classificação:</strong> 
+                    <span className={`badge ${getClassificationColor(triagem.classificacao)}`} style={{ marginLeft: '8px' }}>
+                      {getClassificationText(triagem.classificacao)}
+                    </span>
+                  </p>
+                  <p><strong>Status:</strong> {triagem.validado ? 'Validado' : 'Pendente'}</p>
+                  
+                  {!triagem.validado && (
+                    <div className="text-right">
+                      <button 
+                        className="button"
+                        onClick={() => handleValidate(triagem)}
+                      >
+                        Validar
+                      </button>
+                    </div>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+    );
+  };
 
   return (
     <div>
       <Head>
-        <title>Página inicial administrador</title>
-        <meta name="description" content="Dashboard do Sistema de Triagem" />
-        <link rel="icon" href="https://hci.org.br/wp-content/uploads/2023/07/cropped-fav-150x150.png" />
+        <title>Dashboard - Sistema de Triagem HCI</title>
+        <meta name="description" content="Dashboard administrativo do Sistema de Triagem HCI" />
       </Head>
 
-      <div style={{ minHeight: '100vh' }}>
-        {/* Header Navigation */}
-        <header style={{
-          background: 'var(--hci-azul)',
-          color: 'white',
-          padding: '1rem',
-          boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
-        }}>
-          <div style={{
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-            maxWidth: '1200px',
-            margin: '0 auto'
-          }}>
-            <div>
-              <h3 style={{ color: 'white', margin: 0 }}>Bem-vindo, {user.charAt(0).toUpperCase() + user.slice(1)}!</h3>
-            </div>
-            
-            <nav style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
-              <button 
-                className={`button ${activeMenu === 'dashboard' ? 'button-active' : ''}`}
-                style={{ 
-                  background: activeMenu === 'dashboard' ? 'var(--hci-verde)' : 'var(--hci-azul)',
-                  marginBottom: 0 
-                }}
-                onClick={() => handleMenuClick('dashboard')}
-              >
-                Dashboard
-              </button>
-              <button 
-                className={`button ${activeMenu === 'pendentes' ? 'button-active' : ''}`}
-                style={{ 
-                  background: activeMenu === 'pendentes' ? 'var(--hci-verde)' : 'var(--hci-azul)',
-                  marginBottom: 0 
-                }}
-                onClick={() => handleMenuClick('pendentes')}
-              >
-                Pendentes
-              </button>
-              <button 
-                className={`button ${activeMenu === 'todas' ? 'button-active' : ''}`}
-                style={{ 
-                  background: activeMenu === 'todas' ? 'var(--hci-verde)' : 'var(--hci-azul)',
-                  marginBottom: 0 
-                }}
-                onClick={() => handleMenuClick('todas')}
-              >
-                Todas
-              </button>
-              <button 
-                className={`button ${activeMenu === 'conhecimento' ? 'button-active' : ''}`}
-                style={{ 
-                  background: activeMenu === 'conhecimento' ? 'var(--hci-verde)' : 'var(--hci-azul)',
-                  marginBottom: 0 
-                }}
-                onClick={() => handleMenuClick('conhecimento')}
-              >
-                Conhecimento
-              </button>
-              <button 
-                className={`button ${activeMenu === 'exportar' ? 'button-active' : ''}`}
-                style={{ 
-                  background: activeMenu === 'exportar' ? 'var(--hci-verde)' : 'var(--hci-azul)',
-                  marginBottom: 0 
-                }}
-                onClick={() => handleMenuClick('exportar')}
-              >
-                Exportar
-              </button>
-              
-              <button 
-                className="button"
-                style={{ 
-                  background: '#dc3545',
-                  marginBottom: 0,
-                  marginLeft: '1rem' 
-                }}
-                onClick={handleLogout}
-              >
-                Logout
-              </button>
-            </nav>
-          </div>
-        </header>
+      {/* Navbar Superior */}
+      <div className="navbar">
+        <div className="navbar-brand">
+          <h3>Sistema de Triagem</h3>
+          <p>Painel Administrativo</p>
+        </div>
         
-        {/* Main content */}
-        <main style={{ 
-          padding: '2rem', 
-          maxWidth: '1200px', 
-          margin: '0 auto' 
-        }}>
-          {loading ? (
-            <div style={{ textAlign: 'center', padding: '2rem' }}>
-              <p>Carregando...</p>
-            </div>
-          ) : error ? (
-            <div style={{ color: 'red', padding: '1rem' }}>
-              <p>{error}</p>
-              <button 
-                className="button"
-                onClick={fetchDashboardData}
-              >
-                Tentar novamente
-              </button>
-            </div>
-          ) : (
-            renderContent()
-          )}
-        </main>
+        <div className="navbar-menu">
+          <a 
+            className={`navbar-link ${activeMenu === 'dashboard' ? 'active' : ''}`}
+            onClick={() => handleMenuClick('dashboard')}
+          >
+            Dashboard
+          </a>
+          <a 
+            className={`navbar-link ${activeMenu === 'pendentes' ? 'active' : ''}`}
+            onClick={() => handleMenuClick('pendentes')}
+          >
+            Triagens Pendentes
+          </a>
+          <a 
+            className={`navbar-link ${activeMenu === 'todas' ? 'active' : ''}`}
+            onClick={() => handleMenuClick('todas')}
+          >
+            Todas as Triagens
+          </a>
+          <a 
+            className="navbar-link"
+            onClick={() => {
+              localStorage.removeItem('user');
+              router.push('/admin');
+            }}
+          >
+            Sair
+          </a>
+        </div>
       </div>
+      
+      {/* Main Content */}
+      <div className="main-content">
+        {loading && !validatingTriagem ? (
+          <div className="text-center p-5">
+            <p>Carregando...</p>
+          </div>
+        ) : error ? (
+          <div className="alert alert-danger">
+            {error}
+          </div>
+        ) : validatingTriagem ? (
+          renderValidationPage()
+        ) : activeMenu === 'dashboard' ? (
+          renderDashboard()
+        ) : (
+          renderTriagensList()
+        )}
+      </div>
+      
+      {/* Modal de Notificação */}
+      <Modal 
+        isOpen={modalOpen}
+        onClose={() => setModalOpen(false)}
+        message={modalMessage}
+      />
     </div>
   );
 }

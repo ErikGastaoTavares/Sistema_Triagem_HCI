@@ -373,6 +373,27 @@ async def status():
             "api": "degraded",
             "error": str(e)
         }
+    
+@app.post("/api/validar-triagem/{id}")
+async def validar_triagem(id: str):
+    try:
+        # Conectar ao banco de dados
+        conn = sqlite3.connect('validacao_triagem.db')
+        cursor = conn.cursor()
+        
+        # Atualizar o status da triagem para validado
+        cursor.execute(
+            "UPDATE validacao_triagem SET validado = 1 WHERE id = ?",
+            (id,)
+        )
+        
+        conn.commit()
+        conn.close()
+        
+        return {"message": "Triagem validada com sucesso"}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Erro ao validar triagem: {str(e)}")
+
 
 if __name__ == "__main__":
     import uvicorn

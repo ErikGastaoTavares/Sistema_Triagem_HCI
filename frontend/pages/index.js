@@ -8,7 +8,7 @@ import Card from '../components/Card';
 import Button from '../components/Button';
 import FormGroup from '../components/FormGroup';
 
-// Função para renderizar a análise clínica em formato de lista
+// Função para renderizar a análise clínica em formato de pontos destacados
 const renderAnaliseClinica = (analise) => {
   if (!analise) return null;
   
@@ -31,15 +31,18 @@ const renderAnaliseClinica = (analise) => {
   }
   
   return (
-    <ul className="topicos-lista">
+    <div className="analise-clinica-container">
       {topicos.map((topico, index) => (
-        <li key={index} className="topico-item">{topico}</li>
+        <div key={index} className="analise-item">
+          <div className="analise-bullet">•</div>
+          <div className="analise-text">{topico}</div>
+        </div>
       ))}
-    </ul>
+    </div>
   );
 };
 
-// Função para renderizar as condutas recomendadas em formato de lista
+// Função para renderizar as condutas recomendadas em formato de pontos destacados
 const renderCondutasRecomendadas = (condutas) => {
   if (!condutas) return null;
   
@@ -61,11 +64,14 @@ const renderCondutasRecomendadas = (condutas) => {
   }
   
   return (
-    <ol className="condutas-lista">
+    <div className="condutas-container">
       {topicos.map((topico, index) => (
-        <li key={index} className="conduta-item">{topico}</li>
+        <div key={index} className="conduta-item-card">
+          <div className="conduta-numero">{index + 1}</div>
+          <div className="conduta-text">{topico}</div>
+        </div>
       ))}
-    </ol>
+    </div>
   );
 };
 
@@ -189,21 +195,24 @@ export default function Home() {
                 </h3>
               </div>
               
-              <div className="section">
-                <h3>Análise Clínica</h3>
+              <div className="resultado-section">
+                <h3 className="resultado-title">Análise Clínica</h3>
                 {renderAnaliseClinica(result.justificativa)}
               </div>
 
-              <div className="section">
-                <h3>Condutas Recomendadas</h3>
+              <div className="resultado-section">
+                <h3 className="resultado-title">Condutas Recomendadas</h3>
                 {renderCondutasRecomendadas(result.condutas)}
               </div>
               
-              <Card type="success" className="mt-3">
-                <p>✅ Triagem enviada para validação com sucesso!</p>
-                <p>ID de Rastreamento: {result.id}</p>
-                <p>A triagem será revisada por especialistas clínicos para garantir a precisão da classificação e das condutas sugeridas.</p>
-              </Card>
+              <div className="resultado-success">
+                <div className="resultado-success-icon">✅</div>
+                <div className="resultado-success-content">
+                  <p className="resultado-success-title">Triagem enviada para validação com sucesso!</p>
+                  <p className="resultado-success-id">ID de Rastreamento: {result.id}</p>
+                  <p className="resultado-success-message">A triagem será revisada por especialistas clínicos para garantir a precisão da classificação e das condutas sugeridas.</p>
+                </div>
+              </div>
             </Card>
           )}
         </main>

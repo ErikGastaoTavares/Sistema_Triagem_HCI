@@ -30,7 +30,7 @@ projeto_melhorado/
 
 1. Navegue até a pasta do backend:
    ```bash
-   cd projeto_melhorado/backend
+   cd sistema_triagem/backend
    ```
 
 2. Crie e ative um ambiente virtual Python:
@@ -65,7 +65,7 @@ projeto_melhorado/
 
 1. Navegue até a pasta do frontend:
    ```bash
-   cd projeto_melhorado/frontend
+   cd sistema_triagem/frontend
    ```
 
 2. Instale as dependências:
