@@ -1,0 +1,35 @@
+# Crie um arquivo .gitignore com o seguinte conteúdo
+echo "# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.env
+venv/
+ENV/
+env/
+
+# Node.js
+node_modules/
+npm-debug.log
+yarn-debug.log
+yarn-error.log
+.pnp/
+.pnp.js
+
+# Banco de dados
+*.db
+*.sqlite3
+
+# Logs
+*.log
+
+# Arquivos de sistema
+.DS_Store
+Thumbs.db
+
+# Ambiente de desenvolvimento
+.idea/
+.vscode/
+*.swp
+*.swo" > .gitignore
