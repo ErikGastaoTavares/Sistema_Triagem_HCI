@@ -121,8 +121,34 @@ export default function Dashboard() {
     setFeedback('');
   };
 
+  // Função para formatar data de forma segura
+  const formatDate = (dateString) => {
+    if (!dateString) return 'Data não disponível';
+    
+    try {
+      const date = new Date(dateString);
+      // Verifica se a data é válida
+      if (isNaN(date.getTime())) {
+        return 'Data não disponível';
+      }
+      return date.toLocaleString();
+    } catch (error) {
+      console.error('Erro ao formatar data:', error);
+      return 'Data não disponível';
+    }
+  };
+
+  // Função para truncar texto com segurança
+  const truncateText = (text, maxLength = 100) => {
+    if (!text) return 'Não disponível';
+    if (text.length <= maxLength) return text;
+    return `${text.substring(0, maxLength)}...`;
+  };
+
   const getClassificationColor = (classification) => {
-    const classLower = classification?.toLowerCase();
+    if (!classification) return '';
+    
+    const classLower = classification.toLowerCase();
     if (classLower === 'vermelho') return 'classification-red';
     if (classLower === 'laranja') return 'classification-orange';
     if (classLower === 'amarelo') return 'classification-yellow';
@@ -132,13 +158,15 @@ export default function Dashboard() {
   };
 
   const getClassificationText = (classification) => {
-    const classLower = classification?.toLowerCase();
+    if (!classification) return 'NÃO CLASSIFICADO';
+    
+    const classLower = classification.toLowerCase();
     if (classLower === 'vermelho') return 'EMERGÊNCIA (VERMELHO)';
     if (classLower === 'laranja') return 'MUITO URGENTE (LARANJA)';
     if (classLower === 'amarelo') return 'URGENTE (AMARELO)';
     if (classLower === 'verde') return 'POUCO URGENTE (VERDE)';
     if (classLower === 'azul') return 'NÃO URGENTE (AZUL)';
-    return classification?.toUpperCase();
+    return classification.toUpperCase();
   };
 
   // Render validation page
@@ -169,9 +197,9 @@ export default function Dashboard() {
             <h3 className="card-title">Informações do Paciente</h3>
           </div>
           <div className="card-body">
-            <p><strong>ID da Triagem:</strong> {triagem?.id}</p>
-            <p><strong>Data:</strong> {new Date(triagem?.data).toLocaleString()}</p>
-            <p><strong>Sintomas:</strong> {triagem?.sintomas}</p>
+            <p><strong>ID da Triagem:</strong> {triagem?.id || 'ID não disponível'}</p>
+            <p><strong>Data:</strong> {formatDate(triagem?.data)}</p>
+            <p><strong>Sintomas:</strong> {triagem?.sintomas || 'Sintomas não disponíveis'}</p>
           </div>
         </div>
         
@@ -186,12 +214,12 @@ export default function Dashboard() {
             
             <div className="section">
               <h3 className="section-title">Análise Clínica</h3>
-              <p>{triagem?.justificativa}</p>
+              <p>{triagem?.justificativa || 'Análise clínica não disponível'}</p>
             </div>
             
             <div className="section">
               <h3 className="section-title">Condutas Recomendadas</h3>
-              <p>{triagem?.condutas}</p>
+              <p>{triagem?.condutas || 'Condutas não disponíveis'}</p>
             </div>
           </div>
         </div>
@@ -262,10 +290,10 @@ export default function Dashboard() {
             ) : (
               <div>
                 {triagens.slice(0, 5).map((triagem) => (
-                  <div key={triagem.id} className="card mb-3">
+                  <div key={triagem.id || Math.random().toString()} className="card mb-3">
                     <div className="card-body">
-                      <p><strong>Data:</strong> {new Date(triagem.data).toLocaleString()}</p>
-                      <p><strong>Sintomas:</strong> {triagem.sintomas.substring(0, 100)}...</p>
+                      <p><strong>Data:</strong> {formatDate(triagem.data)}</p>
+                      <p><strong>Sintomas:</strong> {truncateText(triagem.sintomas)}</p>
                       <p>
                         <strong>Classificação:</strong> 
                         <span className={`badge ${getClassificationColor(triagem.classificacao)}`} style={{ marginLeft: '8px' }}>
@@ -317,11 +345,11 @@ export default function Dashboard() {
         ) : (
           <div>
             {triagens.map((triagem) => (
-              <div key={triagem.id} className="card mb-3">
+              <div key={triagem.id || Math.random().toString()} className="card mb-3">
                 <div className="card-body">
-                  <p><strong>ID:</strong> {triagem.id}</p>
-                  <p><strong>Data:</strong> {new Date(triagem.data).toLocaleString()}</p>
-                  <p><strong>Sintomas:</strong> {triagem.sintomas.substring(0, 100)}...</p>
+                  <p><strong>ID:</strong> {triagem.id || 'ID não disponível'}</p>
+                  <p><strong>Data:</strong> {formatDate(triagem.data)}</p>
+                  <p><strong>Sintomas:</strong> {truncateText(triagem.sintomas)}</p>
                   <p>
                     <strong>Classificação:</strong> 
                     <span className={`badge ${getClassificationColor(triagem.classificacao)}`} style={{ marginLeft: '8px' }}>
