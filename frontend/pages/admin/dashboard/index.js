@@ -198,7 +198,7 @@ export default function Dashboard() {
           </div>
           <div className="card-body">
             <p><strong>ID da Triagem:</strong> {triagem?.id || 'ID não disponível'}</p>
-            <p><strong>Data:</strong> {formatDate(triagem?.data)}</p>
+            <p><strong>Data:</strong> {formatDate(triagem?.data_hora)}</p>
             <p><strong>Sintomas:</strong> {triagem?.sintomas || 'Sintomas não disponíveis'}</p>
           </div>
         </div>
@@ -292,7 +292,7 @@ export default function Dashboard() {
                 {triagens.slice(0, 5).map((triagem) => (
                   <div key={triagem.id || Math.random().toString()} className="card mb-3">
                     <div className="card-body">
-                      <p><strong>Data:</strong> {formatDate(triagem.data)}</p>
+                      <p><strong>Data:</strong> {formatDate(triagem.data_hora)}</p>
                       <p><strong>Sintomas:</strong> {truncateText(triagem.sintomas)}</p>
                       <p>
                         <strong>Classificação:</strong> 

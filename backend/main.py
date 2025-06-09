@@ -169,7 +169,8 @@ def obter_triagens(filtro="todas"):
     conn = sqlite3.connect('./validacao_triagem.db')
     cursor = conn.cursor()
     
-    query = "SELECT id, sintomas, resposta, data_hora, validado, feedback, validado_por, data_validacao FROM validacao_triagem"
+    # CORREÇÃO: Incluir classificacao, justificativa e condutas na query
+    query = "SELECT id, sintomas, resposta, data_hora, validado, feedback, validado_por, data_validacao, classificacao, justificativa, condutas FROM validacao_triagem"
     
     if filtro == "pendentes":
         query += " WHERE validado = 0"
@@ -192,7 +193,11 @@ def obter_triagens(filtro="todas"):
             "validado": triagem[4],
             "feedback": triagem[5],
             "validado_por": triagem[6],
-            "data_validacao": triagem[7]
+            "data_validacao": triagem[7],
+            # CORREÇÃO: Adicionar campos que estavam faltando
+            "classificacao": triagem[8],
+            "justificativa": triagem[9],
+            "condutas": triagem[10]
         })
     
     logger.info(f"Triagens obtidas: {len(result)} triagens (filtro: {filtro})")
